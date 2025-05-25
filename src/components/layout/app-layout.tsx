@@ -62,7 +62,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
 
   return (
-    <SidebarProvider defaultOpen={false}> {/* Changed to false for mobile-first: collapsed by default */}
+    <SidebarProvider defaultOpen={true}> {/* Expanded by default for desktop, mobile handles its own collapsed state */}
       <Sidebar collapsible="icon" className="border-r border-sidebar-border">
         <SidebarHeader className="p-4 items-center flex flex-row justify-between">
           <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
