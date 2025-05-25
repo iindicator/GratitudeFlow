@@ -1,11 +1,21 @@
+// Ensure this component is a client component
+"use client"; 
+
+import React, { useState, useEffect } from 'react';
 import { AffirmationDisplay } from '@/components/affirmation-display';
 import { morningAffirmationsData, eveningAffirmationsData, dailyPrinciplesData } from '@/lib/data';
+import type { Principle } from '@/types';
 import { Sunrise, Sunset, Star } from 'lucide-react';
 
 export default function DashboardPage() {
-  // For principles, we can show one random principle or cycle through them
-  // For simplicity, let's pick one for now.
-  const dailyPrinciple = dailyPrinciplesData[Math.floor(Math.random() * dailyPrinciplesData.length)];
+  const [dailyPrinciple, setDailyPrinciple] = useState<Principle | null>(null);
+
+  useEffect(() => {
+    // Select a random principle on the client side after hydration
+    if (dailyPrinciplesData.length > 0) {
+      setDailyPrinciple(dailyPrinciplesData[Math.floor(Math.random() * dailyPrinciplesData.length)]);
+    }
+  }, []); // Empty dependency array ensures this runs once on mount
 
   return (
     <div className="container mx-auto py-8">
@@ -19,7 +29,7 @@ export default function DashboardPage() {
         />
         <AffirmationDisplay 
           title="Daily Principle" 
-          items={[dailyPrinciple]} // Display a single principle, or allow rotation
+          items={dailyPrinciple ? [dailyPrinciple] : []} // Display a single principle, or allow rotation
           icon={<Star className="h-6 w-6" />}
         />
         <AffirmationDisplay 
