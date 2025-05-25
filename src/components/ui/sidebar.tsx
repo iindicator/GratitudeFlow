@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -176,8 +177,14 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const [hasMounted, setHasMounted] = React.useState(false);
+
+    React.useEffect(() => {
+      setHasMounted(true);
+    }, []);
 
     if (collapsible === "none") {
+      // This case is independent of isMobile, so render it directly.
       return (
         <div
           className={cn(
@@ -189,9 +196,18 @@ const Sidebar = React.forwardRef<
         >
           {children}
         </div>
-      )
+      );
     }
 
+    // For other collapsible types that depend on isMobile:
+    if (!hasMounted) {
+      // Render null on the server and during the initial client render
+      // to prevent hydration mismatch. The actual UI will be rendered
+      // client-side after mounting.
+      return null;
+    }
+    
+    // Now hasMounted is true, and isMobile has its true client-side value.
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
@@ -212,6 +228,7 @@ const Sidebar = React.forwardRef<
       )
     }
 
+    // Desktop version (collapsible !== "none" and !isMobile and hasMounted)
     return (
       <div
         ref={ref}
@@ -220,6 +237,7 @@ const Sidebar = React.forwardRef<
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        // {...props} // Props are passed to the inner fixed div for desktop
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
@@ -244,7 +262,7 @@ const Sidebar = React.forwardRef<
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
             className
           )}
-          {...props}
+          {...props} // Pass props here for the desktop version's main container
         >
           <div
             data-sidebar="sidebar"
@@ -761,3 +779,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    
